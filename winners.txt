@@ -1,0 +1,45 @@
+Sub AssignRandomNumbersAndSort()
+    Dim ws1 As Worksheet, ws2 As Worksheet
+    Dim lastRow As Long, i As Long
+    
+    ' Set the worksheets
+    Set ws1 = ThisWorkbook.Sheets("Extract")
+    Set ws2 = ThisWorkbook.Sheets("Winners")
+    
+    ' Find the last row in Sheet1
+    lastRow = ws1.Cells(ws1.Rows.Count, "A").End(xlUp).Row
+    
+    ' Clear existing data in Sheet2
+    ws2.Cells.Clear
+    
+    ' Copy headers to Sheet2
+    ws1.Range("A1:C1").Copy Destination:=ws2.Range("A1")
+    ws2.Cells(1, 4).Value = "Random Number"
+    
+    ' Initialize the random number generator
+    Randomize
+    
+    ' Assign random numbers in column D
+    For i = 2 To lastRow
+        ws1.Cells(i, 4).Value = Rnd()
+    Next i
+    
+    ' Sort the data based on the random numbers in ascending order
+    ws1.Sort.SortFields.Clear
+    ws1.Sort.SortFields.Add Key:=ws1.Range("D2:D" & lastRow), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    With ws1.Sort
+        .SetRange ws1.Range("A1:D" & lastRow)
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    
+    ' Copy the top 20 entries to Sheet2
+    ws1.Range("A2:D21").Copy Destination:=ws2.Range("A2")
+    
+    ' Remove random numbers from Sheet1 (optional)
+    ws1.Range("D2:D" & lastRow).ClearContents
+End Sub
+
